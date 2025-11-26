@@ -222,46 +222,61 @@ const flatRecommendedConfig: Config[] = defineConfig([
 	// Base ESLint recommended rules
 	js.configs.recommended,
 	
-	// JavaScript files configuration
-	{
-		files: ['**/*.js', "**/*.jsx"],
-		plugins: {
-			obsidianmd: plugin,
-			import: importPlugin,
-			"@microsoft/sdl": sdl,
-			depend,
-			'@typescript-eslint': (tseslint.configs.recommendedTypeChecked[0] as any).plugins['@typescript-eslint']
-		},
-		rules: {
-			...flatRecommendedGeneralRules,
-			// Only apply base rules (no type-checked rules) for JavaScript
-			...recommendedPluginRulesConfigBase
-		}
-	},
-	
-	// TypeScript files configuration
-	// Manually apply TypeScript rules with proper file scoping
-	{
-		files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
-		plugins: {
-			obsidianmd: plugin,
-			import: importPlugin,
-			"@microsoft/sdl": sdl,
-			depend,
-			'@typescript-eslint': (tseslint.configs.recommendedTypeChecked[0] as any).plugins['@typescript-eslint']
-		},
-		languageOptions: {
-			...(tseslint.configs.recommendedTypeChecked[0] as any).languageOptions,
-		},
-		rules: {
-			...flatRecommendedGeneralRules,
-			// Merge TypeScript recommended rules
-			...(tseslint.configs.recommendedTypeChecked[1] as any).rules,
-			...(tseslint.configs.recommendedTypeChecked[2] as any).rules,
-			// Apply all obsidianmd rules (including type-checked) for TypeScript
-			...recommendedPluginRulesConfig
-		},
-	},
+	// Extract TypeScript plugin and configs for reuse
+	// TypeScript ESLint's recommendedTypeChecked is an array of 3 configs:
+	// [0] - Base config with plugin and parser
+	// [1] - ESLint recommended overrides for TS files
+	// [2] - TypeScript-specific recommended rules
+	...((() => {
+		const tsConfigs = tseslint.configs.recommendedTypeChecked as any[];
+		const tsPlugin = tsConfigs[0].plugins['@typescript-eslint'];
+		const tsLanguageOptions = tsConfigs[0].languageOptions;
+		const tsEslintRecommendedRules = tsConfigs[1].rules;
+		const tsRecommendedRules = tsConfigs[2].rules;
+		
+		return [
+			// JavaScript files configuration
+			{
+				files: ['**/*.js', "**/*.jsx"],
+				plugins: {
+					obsidianmd: plugin,
+					import: importPlugin,
+					"@microsoft/sdl": sdl,
+					depend,
+					'@typescript-eslint': tsPlugin
+				},
+				rules: {
+					...flatRecommendedGeneralRules,
+					// Only apply base rules (no type-checked rules) for JavaScript
+					...recommendedPluginRulesConfigBase
+				}
+			},
+			
+			// TypeScript files configuration
+			// Manually apply TypeScript rules with proper file scoping
+			{
+				files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
+				plugins: {
+					obsidianmd: plugin,
+					import: importPlugin,
+					"@microsoft/sdl": sdl,
+					depend,
+					'@typescript-eslint': tsPlugin
+				},
+				languageOptions: {
+					...tsLanguageOptions,
+				},
+				rules: {
+					...flatRecommendedGeneralRules,
+					// Merge TypeScript recommended rules
+					...tsEslintRecommendedRules,
+					...tsRecommendedRules,
+					// Apply all obsidianmd rules (including type-checked) for TypeScript
+					...recommendedPluginRulesConfig
+				},
+			}
+		];
+	})()),
 	
 	// JSON files configuration (package.json)
 	{
