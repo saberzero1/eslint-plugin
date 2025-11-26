@@ -86,7 +86,8 @@ const plugin = {
 	}
 } satisfies ESLint.Plugin;
 
-const recommendedPluginRulesConfig: RulesConfig = {
+// Rules that don't require TypeScript type information (can apply to JS and TS files)
+const recommendedPluginRulesConfigBase: RulesConfig = {
 	"obsidianmd/commands/no-command-in-command-id": "error",
 	"obsidianmd/commands/no-command-in-command-name": "error",
 	"obsidianmd/commands/no-default-hotkeys": "error",
@@ -98,21 +99,31 @@ const recommendedPluginRulesConfig: RulesConfig = {
 	"obsidianmd/detach-leaves": "error",
 	"obsidianmd/hardcoded-config-path": "error",
 	"obsidianmd/no-forbidden-elements": "error",
-	"obsidianmd/no-plugin-as-component": "error",
 	"obsidianmd/no-sample-code": "error",
 	"obsidianmd/no-tfile-tfolder-cast": "error",
-	"obsidianmd/no-view-references-in-plugin": "error",
 	"obsidianmd/no-static-styles-assignment": "error",
 	"obsidianmd/object-assign": "error",
 	"obsidianmd/platform": "error",
-	"obsidianmd/prefer-file-manager-trash-file": "warn",
 	"obsidianmd/prefer-abstract-input-suggest": "error",
 	"obsidianmd/regex-lookbehind": "error",
 	"obsidianmd/sample-names": "error",
 	"obsidianmd/validate-manifest": "error",
 	"obsidianmd/validate-license": ["error"],
 	"obsidianmd/ui/sentence-case": ["error", { enforceCamelCaseLower: true }],
-}
+};
+
+// Rules that require TypeScript type information (TypeScript-only)
+const recommendedPluginRulesConfigTypeChecked: RulesConfig = {
+	"obsidianmd/no-plugin-as-component": "error",
+	"obsidianmd/no-view-references-in-plugin": "error",
+	"obsidianmd/prefer-file-manager-trash-file": "warn",
+};
+
+// Combined rules for TypeScript files
+const recommendedPluginRulesConfig: RulesConfig = {
+	...recommendedPluginRulesConfigBase,
+	...recommendedPluginRulesConfigTypeChecked,
+};
 
 const flatRecommendedGeneralRules: RulesConfig = {
 	"no-unused-vars": "off",
@@ -208,42 +219,52 @@ const flatRecommendedGeneralRules: RulesConfig = {
 };
 
 const flatRecommendedConfig: Config[] = defineConfig([
+	// Base ESLint recommended rules
 	js.configs.recommended,
+	
+	// JavaScript files configuration
 	{
-		plugins: {
-			obsidianmd: plugin
-		}
-	},
-	{
-		plugins: {
-			import: importPlugin,
-			"@microsoft/sdl": sdl,
-			depend
-		},
 		files: ['**/*.js', "**/*.jsx"],
-		extends: tseslint.configs.recommended as Config[],
-		rules: {
-			...flatRecommendedGeneralRules,
-			...recommendedPluginRulesConfig
-		}
-	},
-	{
 		plugins: {
+			obsidianmd: plugin,
 			import: importPlugin,
 			"@microsoft/sdl": sdl,
-			depend
+			depend,
+			'@typescript-eslint': (tseslint.configs.recommendedTypeChecked[0] as any).plugins['@typescript-eslint']
 		},
-		files: ['**/*.ts', "**/*.tsx"],
-		extends: tseslint.configs.recommendedTypeChecked as Config[],
 		rules: {
 			...flatRecommendedGeneralRules,
+			// Only apply base rules (no type-checked rules) for JavaScript
+			...recommendedPluginRulesConfigBase
+		}
+	},
+	
+	// TypeScript files configuration
+	// Manually apply TypeScript rules with proper file scoping
+	{
+		files: ['**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
+		plugins: {
+			obsidianmd: plugin,
+			import: importPlugin,
+			"@microsoft/sdl": sdl,
+			depend,
+			'@typescript-eslint': (tseslint.configs.recommendedTypeChecked[0] as any).plugins['@typescript-eslint']
+		},
+		rules: {
+			...flatRecommendedGeneralRules,
+			// Merge TypeScript recommended rules
+			...(tseslint.configs.recommendedTypeChecked[1] as any).rules,
+			...(tseslint.configs.recommendedTypeChecked[2] as any).rules,
+			// Apply all obsidianmd rules (including type-checked) for TypeScript
 			...recommendedPluginRulesConfig
 		},
 	},
+	
+	// JSON files configuration (package.json)
 	{
 		files: ['package.json'],
 		language: 'json/json',
-		extends: [tseslint.configs.disableTypeChecked as Config],
+		...tseslint.configs.disableTypeChecked,
 		plugins: {
 			depend,
 			json
@@ -257,7 +278,10 @@ const flatRecommendedConfig: Config[] = defineConfig([
 			]
 		}
 	},
+	
+	// Global language options for JS/TS files
 	{
+		files: ['**/*.js', "**/*.jsx", '**/*.ts', "**/*.tsx"],
 		languageOptions: {
 			globals: {
 				...globals.browser,
@@ -284,12 +308,11 @@ const flatRecommendedConfig: Config[] = defineConfig([
 			}
 		},
 	}
-]);
+] as any);
 
-const hybridRecommendedConfig: Config[] = defineConfig({
-	rules: recommendedPluginRulesConfig,
-	extends: flatRecommendedConfig
-});
+const hybridRecommendedConfig: Config[] = defineConfig([
+	...flatRecommendedConfig
+]);
 
 const recommendedWithLocalesEnBase: Config[] = defineConfig([
 	...flatRecommendedConfig,
@@ -336,10 +359,9 @@ const recommendedWithLocalesEnBase: Config[] = defineConfig([
 	}
 ]);
 
-const recommendedWithLocalesEn: Config[] = defineConfig({
-	rules: recommendedPluginRulesConfig,
-	extends: recommendedWithLocalesEnBase
-});
+const recommendedWithLocalesEn: Config[] = defineConfig([
+	...recommendedWithLocalesEnBase
+]);
 
 plugin.configs = {
 	recommended: hybridRecommendedConfig,
