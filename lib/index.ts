@@ -250,6 +250,9 @@ const flatRecommendedConfig: Config[] = defineConfig([
 			depend,
 			'@typescript-eslint': (tseslint.configs.recommendedTypeChecked[0] as any).plugins['@typescript-eslint']
 		},
+		languageOptions: {
+			...(tseslint.configs.recommendedTypeChecked[0] as any).languageOptions,
+		},
 		rules: {
 			...flatRecommendedGeneralRules,
 			// Merge TypeScript recommended rules
