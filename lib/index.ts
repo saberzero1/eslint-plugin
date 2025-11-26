@@ -282,12 +282,14 @@ const flatRecommendedConfig: Config[] = defineConfig([
 	{
 		files: ['package.json'],
 		language: 'json/json',
-		...tseslint.configs.disableTypeChecked,
+		languageOptions: (tseslint.configs.disableTypeChecked as any).languageOptions,
 		plugins: {
 			depend,
 			json
 		},
 		rules: {
+			// Disable TypeScript type-checked rules for JSON files
+			...(tseslint.configs.disableTypeChecked as any).rules,
 			"no-irregular-whitespace": "off",
 			"depend/ban-dependencies": [
 				"error", {
