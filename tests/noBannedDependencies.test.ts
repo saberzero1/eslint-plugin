@@ -1,8 +1,9 @@
 import { RuleTester } from "@typescript-eslint/rule-tester";
 import path from "node:path";
+import { fileURLToPath } from "node:url";
 import rule, { resetScannedPaths } from "../lib/rules/noBannedDependencies.js";
 
-const fixturesDir = path.join(import.meta.dirname, "fixtures", "noBannedDependencies");
+const fixturesDir = path.join(path.dirname(fileURLToPath(import.meta.url)), "fixtures", "noBannedDependencies");
 
 function fixtureFile(fixture: string): string {
     return path.join(fixturesDir, fixture, "index.ts");
