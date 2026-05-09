@@ -101,7 +101,9 @@ const plugin = {
     configs: {
         recommended: [] as Config[],
         recommendedWithLocalesEn: [] as Config[],
-        packageJson: [] as Config[]
+        packageJson: [] as Config[],
+        react: [] as Config[],
+        svelte: [] as Config[]
     }
 } satisfies ESLint.Plugin;
 
@@ -375,10 +377,20 @@ const packageJsonConfig: Config[] = defineConfig([
 	},
 ]);
 
+const reactConfig: Config[] = defineConfig([
+	...hybridRecommendedConfig,
+]);
+
+const svelteConfig: Config[] = defineConfig([
+	...hybridRecommendedConfig,
+]);
+
 plugin.configs = {
     recommended: hybridRecommendedConfig,
     recommendedWithLocalesEn,
-    packageJson: packageJsonConfig
+    packageJson: packageJsonConfig,
+    react: reactConfig,
+    svelte: svelteConfig
 };
 
 export default plugin;
