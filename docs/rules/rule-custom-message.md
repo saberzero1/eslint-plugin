@@ -2,7 +2,7 @@
 
 📝 Allows redefining error messages from other ESLint rules that don't provide this functionality natively.
 
-💼 This rule is enabled in the following configs: ✅ `recommended`, 🇬🇧 `recommendedWithLocalesEn`.
+💼 This rule is enabled in the following configs: `react`, ✅ `recommended`, 🇬🇧 `recommendedWithLocalesEn`, `svelte`.
 
 <!-- end auto-generated rule header -->
 

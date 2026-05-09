@@ -84,8 +84,10 @@ You can also override or add rules:
 |      | Name                       |
 | :--- | :------------------------- |
 |      | `packageJson`              |
+| ⚛️   | `react`                    |
 | ✅    | `recommended`              |
 | 🇬🇧 | `recommendedWithLocalesEn` |
+| 🔥   | `svelte`                   |
 
 <!-- end auto-generated configs list -->
 
