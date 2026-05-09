@@ -26,16 +26,16 @@ const FORBIDDEN_ELEMENT_TYPES = ["link", "style"];
 function isForbiddenCreateElementCall(node: TSESTree.CallExpression): string | undefined {
     // we are looking for document.createElement(...)
     if (!(
-        node.callee.type === "MemberExpression" &&
-        node.callee.property.type === "Identifier" &&
+        node.callee.type === TSESTree.AST_NODE_TYPES.MemberExpression &&
+        node.callee.property.type === TSESTree.AST_NODE_TYPES.Identifier &&
         node.callee.property.name === "createElement" &&
-        node.callee.object.type === "Identifier" &&
+        node.callee.object.type === TSESTree.AST_NODE_TYPES.Identifier &&
         node.callee.object.name === "document"
     )) {
         return undefined;
     }
 
-    if (node.arguments.length === 0) { 
+    if (node.arguments.length === 0) {
         return undefined;
     }
     return isArgumentForbiddenElement(node.arguments[0]);
@@ -45,22 +45,22 @@ function isForbiddenCreateElCall(node: TSESTree.CallExpression): string | undefi
     // we are looking for foo.createEl(...)
 
     if (!(
-        node.callee.type === "MemberExpression" &&
-        node.callee.property.type === "Identifier" &&
+        node.callee.type === TSESTree.AST_NODE_TYPES.MemberExpression &&
+        node.callee.property.type === TSESTree.AST_NODE_TYPES.Identifier &&
         node.callee.property.name === "createEl" &&
-        (node.callee.object.type === "Identifier" || node.callee.object.type === "MemberExpression")
+        (node.callee.object.type === TSESTree.AST_NODE_TYPES.Identifier || node.callee.object.type === TSESTree.AST_NODE_TYPES.MemberExpression)
     )) {
         return undefined;
     }
 
-    if (node.arguments.length === 0) { 
+    if (node.arguments.length === 0) {
         return undefined;
     }
     return isArgumentForbiddenElement(node.arguments[0]);
 }
 
 function isArgumentForbiddenElement(arg: TSESTree.CallExpressionArgument): string | undefined {
-    if (arg.type === "Literal" && typeof arg.value === "string") {
+    if (arg.type === TSESTree.AST_NODE_TYPES.Literal && typeof arg.value === "string") {
         const tagName = arg.value.toLowerCase();
         for (const forbiddenTagName of FORBIDDEN_ELEMENT_TYPES) {
             if (tagName === forbiddenTagName) {

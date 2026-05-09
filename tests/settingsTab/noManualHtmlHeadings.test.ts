@@ -9,9 +9,10 @@ const MOCK_CLASS = `
 const ruleTester = new RuleTester();
 
 ruleTester.run("no-manual-html-headings", noManualHeadingsRule, {
-	valid: [
-		{
-			code: `
+    valid: [
+        {
+            name: "createEl('div') is allowed",
+            code: `
                 ${MOCK_CLASS}
                 class MyTab extends PluginSettingTab {
                     display() {
@@ -19,11 +20,12 @@ ruleTester.run("no-manual-html-headings", noManualHeadingsRule, {
                     }
                 }
             `,
-		},
-	],
-	invalid: [
-		{
-			code: `
+        },
+    ],
+    invalid: [
+        {
+            name: "createEl('h2') is forbidden and auto-fixed to Setting",
+            code: `
                 ${MOCK_CLASS}
                 class MyTab extends PluginSettingTab {
                     display() {
@@ -31,8 +33,8 @@ ruleTester.run("no-manual-html-headings", noManualHeadingsRule, {
                     }
                 }
             `,
-			errors: [{ messageId: "headingEl" }],
-			output: `
+            errors: [{ messageId: "headingEl" }],
+            output: `
                 ${MOCK_CLASS}
                 class MyTab extends PluginSettingTab {
                     display() {
@@ -40,9 +42,10 @@ ruleTester.run("no-manual-html-headings", noManualHeadingsRule, {
                     }
                 }
             `,
-		},
-		{
-			code: `
+        },
+        {
+            name: "createEl('h3') with destructured containerEl is forbidden",
+            code: `
                 ${MOCK_CLASS}
                 class MyTab extends PluginSettingTab {
                     display() {
@@ -51,8 +54,8 @@ ruleTester.run("no-manual-html-headings", noManualHeadingsRule, {
                     }
                 }
             `,
-			errors: [{ messageId: "headingEl" }],
-			output: `
+            errors: [{ messageId: "headingEl" }],
+            output: `
                 ${MOCK_CLASS}
                 class MyTab extends PluginSettingTab {
                     display() {
@@ -61,6 +64,6 @@ ruleTester.run("no-manual-html-headings", noManualHeadingsRule, {
                     }
                 }
             `,
-		},
-	],
+        },
+    ],
 });
