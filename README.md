@@ -30,6 +30,7 @@ import obsidianmd from "eslint-plugin-obsidianmd";
 
 export default defineConfig([
   ...obsidianmd.configs.recommended,
+  ...obsidianmd.configs.packageJson,
   {
     files: ["**/*.ts"],
     languageOptions: {
@@ -82,6 +83,7 @@ You can also override or add rules:
 
 |      | Name                       |
 | :--- | :------------------------- |
+|      | `packageJson`              |
 | ✅    | `recommended`              |
 | 🇬🇧 | `recommendedWithLocalesEn` |
 
@@ -161,6 +163,7 @@ import obsidianmd from "eslint-plugin-obsidianmd";
 
 export default defineConfig([
   ...obsidianmd.configs.recommended,
+  ...obsidianmd.configs.packageJson,
   // Or include English locale files (JSON and TS/JS modules)
   // ...obsidianmd.configs.recommendedWithLocalesEn,
 

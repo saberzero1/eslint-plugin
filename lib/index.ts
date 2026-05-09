@@ -100,7 +100,8 @@ const plugin = {
     } as unknown as Record<string, RuleDefinition<RuleDefinitionTypeOptions>>,
     configs: {
         recommended: [] as Config[],
-        recommendedWithLocalesEn: [] as Config[]
+        recommendedWithLocalesEn: [] as Config[],
+        packageJson: [] as Config[]
     }
 } satisfies ESLint.Plugin;
 
@@ -222,7 +223,7 @@ const flatRecommendedConfig: Config[] = defineConfig([
 		return [
 			// JavaScript files configuration
 			{
-				files: ['**/*.js', "**/*.jsx"],
+				files: ['**/*.js', '**/*.jsx', '**/*.cjs', '**/*.mjs'],
 				plugins: {
 					obsidianmd: plugin,
 					import: importPlugin,
@@ -267,30 +268,9 @@ const flatRecommendedConfig: Config[] = defineConfig([
 		];
 	})()),
 	
-	// JSON files configuration (package.json)
-	{
-		files: ['package.json'],
-		language: 'json/json',
-		languageOptions: (tseslint.configs.disableTypeChecked as any).languageOptions,
-		plugins: {
-			depend,
-			json
-		},
-		rules: {
-			// Disable TypeScript type-checked rules for JSON files
-			...(tseslint.configs.disableTypeChecked as any).rules,
-			"no-irregular-whitespace": "off",
-			"depend/ban-dependencies": [
-				"error", {
-					"presets": ["native", "microutilities", "preferred"]
-				}
-			]
-		}
-	},
-	
 	// Global language options for JS/TS files
 	{
-		files: ['**/*.js', "**/*.jsx", '**/*.ts', "**/*.tsx"],
+		files: ['**/*.js', '**/*.jsx', '**/*.cjs', '**/*.mjs', '**/*.ts', '**/*.tsx', '**/*.mts', '**/*.cts'],
 		languageOptions: {
 			globals: {
 				...globals.browser,
@@ -374,9 +354,31 @@ const recommendedWithLocalesEn: Config[] = defineConfig([
 	...recommendedWithLocalesEnBase
 ]);
 
+const packageJsonConfig: Config[] = defineConfig([
+	{
+		files: ['package.json'],
+		language: 'json/json',
+		languageOptions: (tseslint.configs.disableTypeChecked as any).languageOptions,
+		plugins: {
+			depend,
+			json
+		},
+		rules: {
+			...(tseslint.configs.disableTypeChecked as any).rules,
+			"no-irregular-whitespace": "off",
+			"depend/ban-dependencies": [
+				"error", {
+					"presets": ["native", "microutilities", "preferred"]
+				}
+			]
+		}
+	},
+]);
+
 plugin.configs = {
     recommended: hybridRecommendedConfig,
-    recommendedWithLocalesEn
+    recommendedWithLocalesEn,
+    packageJson: packageJsonConfig
 };
 
 export default plugin;
