@@ -141,7 +141,6 @@ const recommendedPluginRulesConfig: RulesConfig = {
     "obsidianmd/sample-names": "error",
     "obsidianmd/validate-manifest": "error",
     "obsidianmd/validate-license": ["error"],
-    "obsidianmd/ui/sentence-case": ["error", { enforceCamelCaseLower: true }],
 }
 
 import { restrictedGlobalsOptions, restrictedImportsOptions } from "./ruleOptions.js";
