@@ -2,7 +2,7 @@
 
 📝 Disallow usage of Obsidian APIs not available in the plugin's minimum app version.
 
-💼 This rule is enabled in the following configs: ✅ `recommended`, 🇬🇧 `recommendedWithLocalesEn`.
+💼 This rule is enabled in the following configs: `react`, ✅ `recommended`, 🇬🇧 `recommendedWithLocalesEn`, `svelte`.
 
 <!-- end auto-generated rule header -->
 
