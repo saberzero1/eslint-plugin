@@ -6,6 +6,7 @@ import detachLeaves from "./rules/detachLeaves.js";
 import editorDropPaste from "./rules/editorDropPaste.js";
 import hardcodedConfigPath from "./rules/hardcodedConfigPath.js";
 import noForbiddenElements from "./rules/noForbiddenElements.js";
+import noGlobalThis from "./rules/noGlobalThis.js";
 import noSampleCode from "./rules/noSampleCode.js";
 import noPluginAsComponent from "./rules/noPluginAsComponent.js";
 import noStaticStylesAssignment from "./rules/noStaticStylesAssignment.js";
@@ -15,9 +16,8 @@ import objectAssign from "./rules/objectAssign.js";
 import platform from "./rules/platform.js";
 import preferAbstractInputSuggest from "./rules/preferAbstractInputSuggest.js";
 import preferActiveDoc from "./rules/preferActiveDoc.js";
-import preferCreateEl from "./rules/preferCreateEl.js";
 import preferFileManagerTrashFile from "./rules/preferFileManagerTrashFile.js";
-import preferActiveWindowTimers from "./rules/preferActiveWindowTimers.js";
+import preferWindowTimers from "./rules/preferWindowTimers.js";
 import preferInstanceof from "./rules/preferInstanceof.js";
 import preferGetLanguage from "./rules/preferGetLanguage.js";
 import regexLookbehind from "./rules/regexLookbehind.js";
@@ -25,8 +25,8 @@ import sampleNames from "./rules/sampleNames.js";
 import validateManifest from "./rules/validateManifest.js";
 import validateLicense from "./rules/validateLicense.js";
 import ruleCustomMessage from "./rules/ruleCustomMessage.js";
-import noUnsupportedApi from "./rules/noUnsupportedApi.js";
 import noNodejsModules from "./rules/noNodejsModules.js";
+import noUnsupportedApi from "./rules/noUnsupportedApi.js";
 import { getManifest } from "./manifest.js";
 import { ui } from "./rules/ui/index.js";
 
@@ -40,7 +40,7 @@ import depend from 'eslint-plugin-depend';
 import globals from "globals";
 import fs from "node:fs";
 import path from "node:path";
-import { type Config, defineConfig, globalIgnores } from "@eslint/config-helpers";
+import { Config, defineConfig, globalIgnores } from "eslint/config";
 import type { RuleDefinition, RuleDefinitionTypeOptions, RulesConfig } from "@eslint/core";
 import noUnsanitizedPlugin from "eslint-plugin-no-unsanitized";
 
@@ -73,6 +73,7 @@ const plugin = {
         "editor-drop-paste": editorDropPaste,
         "hardcoded-config-path": hardcodedConfigPath,
         "no-forbidden-elements": noForbiddenElements,
+        "no-global-this": noGlobalThis,
         "no-plugin-as-component": noPluginAsComponent,
         "no-sample-code": noSampleCode,
         "no-tfile-tfolder-cast": noTFileTFolderCast,
@@ -82,18 +83,17 @@ const plugin = {
         platform: platform,
         "prefer-abstract-input-suggest": preferAbstractInputSuggest,
         "prefer-active-doc": preferActiveDoc,
-        "prefer-create-el": preferCreateEl,
         "prefer-file-manager-trash-file": preferFileManagerTrashFile,
         "prefer-instanceof": preferInstanceof,
-        "prefer-active-window-timers": preferActiveWindowTimers,
+        "prefer-window-timers": preferWindowTimers,
         "prefer-get-language": preferGetLanguage,
         "regex-lookbehind": regexLookbehind,
         "sample-names": sampleNames,
         "validate-manifest": validateManifest,
         "validate-license": validateLicense,
         "rule-custom-message": ruleCustomMessage,
-        "no-unsupported-api": noUnsupportedApi,
         "no-nodejs-modules": noNodejsModules,
+        "no-unsupported-api": noUnsupportedApi,
         "ui/sentence-case": ui.sentenceCase,
         "ui/sentence-case-json": ui.sentenceCaseJson,
         "ui/sentence-case-locale-module": ui.sentenceCaseLocaleModule,
@@ -153,10 +153,11 @@ const recommendedPluginRulesConfig: RulesConfig = {
 	...recommendedPluginRulesConfigTypeChecked,
 };
 
-import { restrictedGlobalsOptions, restrictedImportsOptions } from "./ruleOptions.js";
+import { restrictedGlobalsOptions, restrictedImportsOptions, noUnusedExpressionsOptions } from "./ruleOptions.js";
 
 const flatRecommendedGeneralRules: RulesConfig = {
     "no-unused-vars": "off",
+    "no-unused-expressions": "off",
     "no-prototype-bultins": "off",
     "no-self-compare": "warn",
     "no-eval": "error",
@@ -168,21 +169,10 @@ const flatRecommendedGeneralRules: RulesConfig = {
     "no-restricted-imports": ["error", ...restrictedImportsOptions],
     "no-alert": "error",
     "no-undef": "error",
-    "@typescript-eslint/no-unused-vars": [
-        "warn",
-        {
-            "args": "all",
-            "argsIgnorePattern": "^_",
-            "caughtErrors": "all",
-            "caughtErrorsIgnorePattern": "^_",
-            "destructuredArrayIgnorePattern": "^_",
-            "varsIgnorePattern": "^_",
-            "ignoreRestSiblings": true
-        }
-    ],
     "@typescript-eslint/ban-ts-comment": "off",
-    "@typescript-eslint/no-require-imports": "off",
     "@typescript-eslint/no-deprecated": "error",
+    "@typescript-eslint/no-unused-vars": ["warn", { args: "none" }],
+    "@typescript-eslint/no-unused-expressions": ["error", ...noUnusedExpressionsOptions],
     "@typescript-eslint/require-await": "off",
     "@typescript-eslint/no-explicit-any": [
         "error",
